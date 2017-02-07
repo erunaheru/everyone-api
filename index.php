@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Level 8 Technology</title>
-	<link rel="stylesheet" href="./main.css" type="text/css">
+	<title>Tugon | Everyone API</title>
+	<link rel="stylesheet" href="/main.css" type="text/css">
 </head>
-<body><div class='container'><div class='centerblock' style='width: 800px;'>
+<body><div class='container'><div class="backdrop"><div class='centerblock' style='width: 800px;'>
 
-<h1>Everyone API Lookup</h1>
+<h1 class='centertext'>Everyone API Lookup</h1>
 
 <?php
 include 'config.php';
@@ -15,9 +15,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 	
 	$number = $_POST[number];
 	$url = "http://api.everyoneapi.com/v1/phone/+1".$number."?account_sid=".$sid."&auth_token=".$auth."&pretty=true";
-	$jsondata = http_parse_message(http_get($url, array(),$httpinfo))->body;
+	$req = new \http\Client\Request('GET', $url);
+	$client = (new \http\Client())
+        ->enqueue($req)
+        ->send();    
+	$resp = $client->getResponse();
+	$jsondata = $resp->getBody();
 	echo "<b>Number:</b> ".$_POST['number']."<br><br>";
-	if ($httpinfo[response_code] == 200) {
+	if ($resp->getResponseCode() == 200) {
 		if (strpos($jsondata, '"status": true') !== FALSE) {
 			$data = json_decode($jsondata);
 //			echo "<pre>";
@@ -53,20 +58,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			echo $jsondata;
 			echo "</pre>";
 		}
-	} elseif ($httpinfo[response_code] == 400) {
+	} elseif ($resp->getResponseCode() == 400) {
 		echo "Invalid Number, $number";
-	} elseif ($httpinfo[response_code] == 401) {
+	} elseif ($resp->getResponseCode() == 401) {
 		echo "Invalid API credentials";
-	} elseif ($httpinfo[response_code] == 402) {
+	} elseif ($resp->getResponseCode() == 402) {
 		echo "Your account balance is too low to complete this request";
-	} elseif ($httpinfo[response_code] == 403) {
+	} elseif ($resp->getResponseCode() == 403) {
 		echo "Your account has been rate limited for suspected malicious activity";
-	} elseif ($httpinfo[response_code] == 404) {
+	} elseif ($resp->getResponseCode() == 404) {
 		echo "Number not found, $number";
 	} else {
 		echo "GET error. Response dump: <br>";
 		echo "<pre>";
-		print_r($httpinfo);
+		print_r($resp);
 		echo "</pre>";
 	}
 	echo "<hr>";
@@ -78,4 +83,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <input type='submit' value='Look up' >
 <br>
 </form>
-</div></div></body></html>
+</div></div></div></body></html>
