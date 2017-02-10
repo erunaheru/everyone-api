@@ -21,7 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ->send();    
 	$resp = $client->getResponse();
 	$jsondata = $resp->getBody();
-	echo "<b>Number:</b> ".$_POST['number']."<br><br>";
+	echo "<b>Number:</b> ".$_POST['number']."<br>";
+	echo "<a href='https://www.everycaller.com/phone-number/1".$_POST['number']."'>Everycaller</a> | ";
+	echo "<a href='http://800notes.com/Phone.aspx/1".$_POST['number']."'>800Notes</a> | ";
+	echo "<a href='http://findwhocallsyou.com/".$_POST['number']."'>Find who calls you</a><br><br>";
+
 	if ($resp->getResponseCode() == 200) {
 		if (strpos($jsondata, '"status": true') !== FALSE) {
 			$data = json_decode($jsondata);
